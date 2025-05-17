@@ -51,7 +51,7 @@ train |>
   scale_fill_manual(values = c("#004c91", "#f47321", "#ffc220"))
 
 
-# Total de vendas por tipo de loja --------------------------------------------
+# Valor médio de vendas por tipo de loja --------------------------------------------
 train |>
   group_by(Type) |> 
   summarise(sales = mean(Weekly_Sales)) |> 
@@ -69,7 +69,7 @@ train |>
         legend.position = "none")  +
   scale_fill_manual(values = c("#004c91", "#f47321", "#ffc220"))
 
-# Ranking de departamento por Total de vendas --------------------------------- 
+# Ranking de departamento por média de vendas --------------------------------- 
 train |> 
   group_by(Dept) |> 
   summarise(sales = mean(Weekly_Sales)) |> 
@@ -215,7 +215,7 @@ train |>
   group_by(Date) |>
   summarise(sales = sum(Weekly_Sales)) |> 
   as_tsibble(index = Date) |>
-  gg_lag(sales, geom = "point", lags = c(1,2,4,12,24,52)) +
+  gg_lag(sales, geom = "point", lags = c(1,2,4, 5,39,48,52)) +
   ylab("Vendas (USD)") +
   scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) +
   scale_x_continuous(labels = label_number(suffix = " M", scale = 1e-6))
