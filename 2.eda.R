@@ -223,7 +223,7 @@ train |>
 # fig 12. Correlação entre as variáveis ---------------------------------------
 train |> 
   group_by(Date) |>
-  summarise(sales = sum(Weekly_Sales),
+  summarise(sales = mean(Weekly_Sales),
             size = mean(Size),
             temp = mean(Temperature),
             fuel = mean(Fuel_Price),
@@ -236,3 +236,71 @@ train |>
             unemp = mean(Unemployment)) |> 
   select(2:12) |> 
   GGally::ggpairs()
+
+# no dias que são feriado as vendas são maiores em média que em dias que não são? 
+
+train |> 
+  #filter(id == "1_1") |>
+  select(Weekly_Sales, IsHoliday) |>
+  group_by(IsHoliday) |> 
+  summarise(mean_sales = mean(Weekly_Sales)) |> 
+  ggplot() +
+    aes(x = IsHoliday, y = mean_sales) +
+    geom_col()
+
+# teste para toda a população
+
+train %>% # precisa usar o pipe do tidyverse
+  #filter(id == "12_3") %>%
+  select(Weekly_Sales, IsHoliday) %>% 
+  t.test(Weekly_Sales ~ IsHoliday, data = .)
+
+# as vendas médias são diferentes entre o tipo de loja? 
+
+train |> 
+  select(Weekly_Sales, Type) |>
+  group_by(Type) |> 
+  summarise(mean_sales = mean(Weekly_Sales)) |> 
+  ggplot() +
+  aes(x = Type, y = mean_sales) +
+  geom_col()
+
+# teste para toda a população
+
+train %>% # precisa usar o pipe do tidyverse
+  filter(Type %in% c("A","B")) %>%
+  select(Weekly_Sales, Type) %>% 
+  t.test(Weekly_Sales ~ Type, data = .)
+
+train %>% # precisa usar o pipe do tidyverse
+  filter(Type %in% c("A","C")) %>%
+  select(Weekly_Sales, Type) %>% 
+  t.test(Weekly_Sales ~ Type, data = .)
+
+train %>% # precisa usar o pipe do tidyverse
+  filter(Type %in% c("B","C")) %>%
+  select(Weekly_Sales, Type) %>% 
+  t.test(Weekly_Sales ~ Type, data = .)
+
+glimpse(train)
+
+# A temperatura tem alguma correlação com o valor médio de vendas ?
+
+train |>
+  filter(id == "15_20") |> 
+  #group_by(Date) |> 
+  #summarise(mean_sales = mean(Weekly_Sales, na.rm = TRUE),
+  #         mean_temperature = mean(Temperature, na.rm = TRUE)) |>
+  ggplot() +
+    aes(x = Weekly_Sales, y = Temperature) +
+    geom_point()
+  
+sales <- train %>%
+  filter(id == "15_20") %>%
+  select(Weekly_Sales)
+
+temp <- train %>%
+  filter(id == "15_20") %>%
+  select(Temperature)
+
+cor(x = sales, y = temp)
